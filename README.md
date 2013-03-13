@@ -3,6 +3,7 @@ EventStoreService
 
 This is a TopShelf wrapper around the EventStore (http://geteventstore.com) so you can host this as a service.
 
+
 Sample Configuration
 
     <?xml version="1.0" encoding="utf-8" ?>
@@ -20,3 +21,9 @@ Sample Configuration
       </eventStore>
       
     </configuration>
+
+If the following settings are optional and will default:
+
+* httpPort - defaults to 2113
+* tcpPort - defaults to 1113
+* runProjections - defaults to false

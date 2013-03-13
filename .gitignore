@@ -76,6 +76,9 @@ _TeamCity*
 # Installshield output folder
 [Ee]xpress/
 
+# Package folder (all Nugets when using package restore)
+packages/
+
 # DocProject is a documentation generator add-in
 DocProject/buildhelp/
 DocProject/Help/*.HxT

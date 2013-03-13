@@ -11,7 +11,7 @@ namespace EventStoreService
         [ConfigurationProperty("", IsDefaultCollection = true, IsKey = false, IsRequired = true)]
         public ServiceInstanceCollection Instances
         {
-            get { return (ServiceInstanceCollection)this[""]; }
+            get { return (ServiceInstanceCollection) this[""]; }
             set { this[""] = value; }
         }
     }
@@ -40,7 +40,7 @@ namespace EventStoreService
 
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((ServiceInstance)element).Name;
+            return ((ServiceInstance) element).Name;
         }
 
         protected override bool IsElementName(string elementName)
@@ -54,59 +54,50 @@ namespace EventStoreService
         [ConfigurationProperty("name", IsRequired = true)]
         public string Name
         {
-            get { return (string)this["name"]; }
+            get { return (string) this["name"]; }
             set { this["name"] = value; }
         }
 
-        [ConfigurationProperty("tcpPort", IsRequired = false)]
+        [ConfigurationProperty("useLoopback", IsRequired = false, DefaultValue = false)]
+        public bool UseLoopback
+        {
+            get { return (bool) this["useLoopback"]; }
+            set { this["useLoopback"] = value; }
+        }
+
+        [ConfigurationProperty("tcpPort", IsRequired = false, DefaultValue = 1113)]
         public int TcpPort
         {
-            get
-            {
-                var port = (int)this["tcpPort"];
-                if (port > 0)
-                {
-                    return port;
-                }
-                return 1113;
-            }
+            get { return (int) this["tcpPort"]; }
             set { this["tcpPort"] = value; }
         }
 
-        [ConfigurationProperty("httpPort", IsRequired = false)]
+        [ConfigurationProperty("httpPort", IsRequired = false, DefaultValue = 2113)]
         public int HttpPort
         {
-            get
-            {
-                var port = (int)this["httpPort"];
-                if (port > 0)
-                {
-                    return port;
-                }
-                return 2113;
-            }
-            
+            get { return (int) this["httpPort"]; }
+
             set { this["httpPort"] = value; }
         }
 
         [ConfigurationProperty("dbPath", IsRequired = true)]
         public string DbPath
         {
-            get { return (string)this["dbPath"]; }
+            get { return (string) this["dbPath"]; }
             set { this["dbPath"] = value; }
         }
 
         [ConfigurationProperty("filePath", IsRequired = true)]
         public string FilePath
         {
-            get { return (string)this["filePath"]; }
+            get { return (string) this["filePath"]; }
             set { this["filePath"] = value; }
         }
 
         [ConfigurationProperty("cachedChunkCount", IsRequired = true)]
         public int CachedChunkCount
         {
-            get { return (int)this["cachedChunkCount"]; }
+            get { return (int) this["cachedChunkCount"]; }
             set { this["cachedChunkCount"] = value; }
         }
 
@@ -115,10 +106,10 @@ namespace EventStoreService
         {
             get
             {
-                var run = this["runProjections"];
+                object run = this["runProjections"];
                 if (run != null)
                 {
-                    return (bool)run;
+                    return (bool) run;
                 }
                 return false;
             }
@@ -127,7 +118,7 @@ namespace EventStoreService
 
         public ProcessStartInfo GetProcessStartInfo(string file, IPAddress address)
         {
-            var arguments = GetProcessArguments(address);
+            string arguments = GetProcessArguments(address);
 
             return new ProcessStartInfo(file, arguments)
             {
@@ -141,14 +132,22 @@ namespace EventStoreService
 
         private string GetProcessArguments(IPAddress address)
         {
+            address = UseLoopback ? IPAddress.Loopback : address;
+            
             if (address == null) throw new ArgumentNullException("address");
+            
             var sb = new StringBuilder();
             sb.AppendFormat("--ip {0} ", address);
             sb.AppendFormat("--tcp-port {0} ", TcpPort);
             sb.AppendFormat("--http-port {0} ", HttpPort);
             sb.AppendFormat("--db {0} ", DbPath);
             sb.AppendFormat("--c {0}", CachedChunkCount);
-            if (RunProjections) { sb.Append(" --run-projections"); }
+            
+            if (RunProjections)
+            {
+                sb.Append(" --run-projections");
+            }
+            
             return sb.ToString();
         }
     }

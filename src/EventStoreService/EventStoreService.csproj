@@ -63,6 +63,14 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>IF EXIST "$(SolutionDir)deploy" GOTO BUILD
+md "$(SolutionDir)deploy\"
+
+:BUILD
+"$(SolutionDir)..\assets\ILMerge\ILMerge.exe" /out:"$(SolutionDir)deploy\$(TargetFileName)" "$(TargetDir)$(TargetFileName)" "$(TargetDir)*.dll" /target:exe /targetplatform:v4,%25windir%25\Microsoft.NET\Framework64\v4.0.30319 /wildcards
+copy "$(TargetDir)$(TargetFileName).config" "$(SolutionDir)deploy" /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

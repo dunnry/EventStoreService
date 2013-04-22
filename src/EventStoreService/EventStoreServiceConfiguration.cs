@@ -116,6 +116,21 @@ namespace EventStoreService
             set { this["runProjections"] = value; }
         }
 
+        [ConfigurationProperty("skipDbVerify", IsRequired = false)]
+        public bool SkipDbVerify
+        {
+            get
+            {
+                object run = this["skipDbVerify"];
+                if (run != null)
+                {
+                    return (bool)run;
+                }
+                return false;
+            }
+            set { this["skipDbVerify"] = value; }
+        }
+
         public ProcessStartInfo GetProcessStartInfo(string file, IPAddress address)
         {
             string arguments = GetProcessArguments(address);
@@ -146,6 +161,11 @@ namespace EventStoreService
             if (RunProjections)
             {
                 sb.Append(" --run-projections");
+            }
+
+            if (SkipDbVerify)
+            {
+                sb.Append(" --skip-db-verify");
             }
             
             return sb.ToString();
